@@ -1,0 +1,66 @@
+# Usage:
+#   docker compose up -d --build          # dev shell + jupyter + tensorboard (CPU)
+#   docker compose --profile gpu up -d    # GPU dev container instead of `rllib`
+#   docker compose exec rllib bash        # open a shell in the dev container
+#   docker compose exec rllib uv add <pkg> # add a dependency (then rebuild to bake it in)
+x-rllib-common: &rllib-common
+  build:
+    context: .
+    dockerfile: docker/Dockerfile
+    args:
+      UID: ${UID:-1000}
+      GID: ${GID:-1000}
+  image: rllib-dev:latest
+  working_dir: /workspace
+  network_mode: host
+  # Ray uses /dev/shm for its object store; the Docker default (64MB) is far too small.
+  shm_size: ${SHM_SIZE:-4.77gb}
+  volumes:
+    # The whole project is mounted, so these host dirs are shared with the container:
+    #   src/ (code), notebooks/, data/ (datasets), results/ (Ray results, checkpoints,
+    #   TensorBoard logs), plots/ (figures), plus pyproject.toml/uv.lock for `uv add`.
+    - .:/workspace
+    - uv-cache:/home/dev/.cache/uv
+  env_file:
+    - path: .env
+      required: false
+
+services:
+  rllib:
+    <<: *rllib-common
+    container_name: rllib-dev
+    stdin_open: true
+    tty: true
+    command: ["sleep", "infinity"]
+
+  rllib-gpu:
+    <<: *rllib-common
+    container_name: rllib-dev-gpu
+    profiles: ["gpu"]
+    stdin_open: true
+    tty: true
+    command: ["sleep", "infinity"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  jupyter:
+    <<: *rllib-common
+    container_name: rllib-jupyter
+    environment:
+      MPLBACKEND: module://matplotlib_inline.backend_inline
+    command: >
+      jupyter lab --ip=0.0.0.0 --port=8888 --no-browser
+      --ServerApp.token=${JUPYTER_TOKEN:-rllib} --notebook-dir=/workspace
+
+  tensorboard:
+    <<: *rllib-common
+    container_name: rllib-tensorboard
+    command: ["tensorboard", "--logdir", "/workspace/results", "--host", "0.0.0.0", "--port", "6006"]
+
+volumes:
+  uv-cache:
