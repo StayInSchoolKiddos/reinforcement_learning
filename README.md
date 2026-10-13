@@ -1,5 +1,17 @@
 # Installing
 
+Make sure to install docker 
+If you are using WSL2 you need to install NVIDIA'S toolkit a shell script is provided to install this for you
+```
+./install_scripts/install_cuda_toolkit_wsl2.sh
+```
+Then build the container
+```
+docker compose up -d --build
+./start.sh
+```
+ 
+
 ## Host networking
 
 All Compose services use `network_mode: host`. On Linux, they share the host's

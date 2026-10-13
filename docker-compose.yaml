@@ -1,0 +1,71 @@
+
+# Usage:
+#   docker compose up -d --build                 # CPU-compatible environment
+#   ./start.sh                                   # Auto-detect GPU and launch
+#   docker compose exec rllib bash               # Development shell
+#   docker compose exec rllib uv add <pkg>       # Add dependency
+#   docker compose logs -f jupyter               # Jupyter logs
+#
+# GPU access is enabled through compose.gpu.yaml when available.
+
+x-rllib-common: &rllib-common
+  build:
+    context: .
+    dockerfile: docker/Dockerfile
+    args:
+      UID: ${UID:-1000}
+      GID: ${GID:-1000}
+
+  image: rllib-dev:latest
+  working_dir: /workspace
+  network_mode: host
+
+  # Ray object store shared memory.
+  shm_size: ${SHM_SIZE:-4gb}
+
+  volumes:
+    - .:/workspace
+    - uv-cache:/home/dev/.cache/uv
+
+  env_file:
+    - path: .env
+      required: false
+
+services:
+  rllib:
+    <<: *rllib-common
+    container_name: rllib-dev
+    stdin_open: true
+    tty: true
+    command: ["sleep", "infinity"]
+
+  jupyter:
+    <<: *rllib-common
+    container_name: rllib-jupyter
+
+    environment:
+      MPLBACKEND: module://matplotlib_inline.backend_inline
+
+    command: >
+      jupyter lab
+      --ip=0.0.0.0
+      --port=8888
+      --no-browser
+      --ServerApp.token=${JUPYTER_TOKEN:-rllib}
+      --notebook-dir=/workspace
+
+  tensorboard:
+    <<: *rllib-common
+    container_name: rllib-tensorboard
+
+    command:
+      - tensorboard
+      - --logdir
+      - /workspace/results
+      - --host
+      - 0.0.0.0
+      - --port
+      - "6006"
+
+volumes:
+  uv-cache:

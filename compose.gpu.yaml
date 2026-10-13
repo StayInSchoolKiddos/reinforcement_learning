@@ -1,0 +1,7 @@
+
+services:
+  rllib:
+    gpus: all
+
+  jupyter:
+    gpus: all

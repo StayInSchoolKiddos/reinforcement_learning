@@ -1,11 +1,13 @@
+
 [project]
 name = "reinforcement-learning"
 version = "0.1.0"
 description = "Ray RLlib experiments"
 requires-python = ">=3.12,<3.13"
+
 dependencies = [
     "ray[rllib,tune,default]==2.59.0",
-    "torch>=2.14",
+    "torch==2.11.0",
     "gymnasium[classic-control,box2d,mujoco]",
     "numpy",
     "pandas",
@@ -17,14 +19,16 @@ dependencies = [
 ]
 
 [tool.uv]
-# Scripts live in src/ and are put on PYTHONPATH; no need to build/install this project.
+# Scripts live in src/ and are put on PYTHONPATH.
 package = false
 
-# CUDA 12.6 PyTorch wheels (they also run on CPU-only hosts).
+# CUDA 12.8 PyTorch wheels, usable for CPU execution too.
 [[tool.uv.index]]
-name = "pytorch-cu126"
-url = "https://download.pytorch.org/whl/cu126"
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
 explicit = true
 
 [tool.uv.sources]
-torch = [{ index = "pytorch-cu126", marker = "sys_platform == 'linux'" }]
+torch = [
+    { index = "pytorch-cu128", marker = "sys_platform == 'linux'" }
+]
