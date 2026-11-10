@@ -1,0 +1,4 @@
+policy,mean_return,std_return,mean_length,time_limit_fraction,episodes
+random,26.0,7.462185372015076,26.0,0.0,20
+untrained,9.3,0.7326950970650464,9.3,0.0,20
+trained,121.75,4.744803251425378,121.75,0.0,20

@@ -394,7 +394,7 @@ flowchart TB
     SIM --> O
 ```
 
-This is an **architectural analogy**, not a working UAV integration. A real aircraft cannot instantaneously move between grid cells; deployment needs dynamics, constraints, verification, and operational safety safeguards. In later sessions, you will move from a Q-table to a neural policy (PPO with RLlib) and ultimately a *toy* mission-level behavior selector.
+This is an **architectural analogy**, not a working UAV integration. A real aircraft cannot instantaneously move between grid cells; deployment needs dynamics, constraints, verification, and operational safety safeguards. In Lesson 02, you will replace the Q-table with a neural action-value function (DQN) and explore Gymnasium through CartPole. Later sessions introduce PPO with RLlib and a *toy* mission-level behavior selector.
 
 ## Reference and source code guide
 
@@ -408,4 +408,4 @@ This is an **architectural analogy**, not a working UAV integration. A real airc
 
 Recommended reading: Sutton and Barto, *Reinforcement Learning: An Introduction*, 2nd edition, **Chapter 1** (intro) and **Chapter 6.5** (Q-learning). Chapter 3 is useful for formalizing an MDP but is not required for this lab.
 
-**Next lesson:** Formalize the problem using Gymnasium's observation spaces, action spaces, reset/step contracts, and environment validation. The separate continuous-navigation environment in Lesson 2 deliberately changes the task difficulty; it is not a drop-in continuation of this grid Q-table.
+**Next lesson:** [Lesson 02 — From Q-tables to Deep Q-Networks](../lesson02_dqn/Lesson_02_DQN_Gymnasium.ipynb) introduces Gymnasium observation/action spaces and reset/step contracts through CartPole, then extends the Bellman update to a neural Q-network with replay and a target network.
